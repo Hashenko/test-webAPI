@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Accounter.DB;
 using Accounter.DB.Entities;
+using Accounter.Services.Interfaces;
 
 namespace Accounter.Controllers
 {
@@ -14,61 +15,45 @@ namespace Accounter.Controllers
     [ApiController]
     public class ContactsController : ControllerBase
     {
-        private readonly ApplicationContext _context;
+        private readonly IContactService _contactService;
 
-        public ContactsController(ApplicationContext context)
+        public ContactsController(IContactService contactService)
         {
-            _context = context;
+            _contactService = contactService;
         }
 
         // GET: api/Contacts
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetContacts()
+        public ActionResult<IEnumerable<Contact>> GetContacts()
         {
-            return await _context.Contacts.ToListAsync();
+            return Ok(_contactService.Get<Contact>());
         }
 
         // GET: api/Contacts/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Contact>> GetContact(int id)
+        public ActionResult<Contact> GetContact(int id)
         {
-            var contact = await _context.Contacts.FindAsync(id);
+            var contact = _contactService.Get<Contact>(id);
 
             if (contact == null)
             {
                 return NotFound();
             }
 
-            return contact;
+            return Ok(contact);
         }
 
         // PUT: api/Contacts/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutContact(int id, Contact contact)
+        public IActionResult PutContact(int id, Contact contact)
         {
             if (id != contact.Id)
             {
                 return BadRequest();
             }
 
-            _context.Entry(contact).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ContactExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            _contactService.Update(contact);
 
             return NoContent();
         }
@@ -76,33 +61,21 @@ namespace Accounter.Controllers
         // POST: api/Contacts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Contact>> PostContact(Contact contact)
+        public ActionResult<Contact> PostContact(Contact contact)
         {
-            _context.Contacts.Add(contact);
-            await _context.SaveChangesAsync();
+
+            _contactService.Create(contact);
 
             return CreatedAtAction("GetContact", new { id = contact.Id }, contact);
         }
 
         // DELETE: api/Contacts/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteContact(int id)
+        public IActionResult DeleteContact(int id)
         {
-            var contact = await _context.Contacts.FindAsync(id);
-            if (contact == null)
-            {
-                return NotFound();
-            }
-
-            _context.Contacts.Remove(contact);
-            await _context.SaveChangesAsync();
+            _contactService.Delete<Contact>(id);
 
             return NoContent();
-        }
-
-        private bool ContactExists(int id)
-        {
-            return _context.Contacts.Any(e => e.Id == id);
         }
     }
 }

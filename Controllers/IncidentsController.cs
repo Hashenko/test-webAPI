@@ -26,7 +26,6 @@ namespace Accounter.Controllers
         [HttpGet]
         public IEnumerable<IEntity> GetIncidents()
         {
-            var incident = _incidentService.Get<Incident>();
             return _incidentService.Get<Incident>();
         }
 
