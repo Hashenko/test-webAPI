@@ -24,6 +24,11 @@ namespace Accounter.DB.UnitOfWork
             return _context.Set<TEntity>().Find(id);
         }
 
+        public TEntity Get<TEntity>(string name) where TEntity : class, IEntity
+        {
+            return _context.Set<TEntity>().Find(name);
+        }
+
         public void Insert<TEntity>(TEntity entity) where TEntity : class, IEntity
         {
             var x = _context.Set<TEntity>().Add(entity);

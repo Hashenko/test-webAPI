@@ -33,7 +33,7 @@ namespace Accounter.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Incident>> GetIncident(string id)
         {
-            var incident = _incidentService.Get<Incident>().FirstOrDefault();
+            var incident = _incidentService.Get(id);
 
             if (incident == null)
             {

@@ -18,5 +18,6 @@ namespace Accounter.DB.UnitOfWork
         void Delete<TEntity>(TEntity entity) where TEntity : class, IEntity;
 
         void Detach<TEntity>(TEntity entity) where TEntity : class, IEntity;
+        TEntity Get<TEntity>(string name) where TEntity : class, IEntity;
     }      
 }
